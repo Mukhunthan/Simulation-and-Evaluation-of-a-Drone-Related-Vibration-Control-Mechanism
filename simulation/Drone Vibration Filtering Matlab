@@ -1,0 +1,128 @@
+%% Drone Vibration Analysis and Filtering (NO TOOLBOX REQUIRED)
+
+clc; clear; close all;
+
+ 
+
+%% Parameters
+
+fs = 1000;         % Sampling frequency (Hz)
+
+t  = 0:1/fs:2;     % Time vector (2 seconds)
+
+f_drone = 5;       % Drone body motion frequency (Hz)
+
+f_vib   = 120;     % Motor vibration frequency (Hz)
+
+ 
+
+%% Simulate Raw IMU Signal
+
+signal_clean = sin(2*pi*f_drone*t);
+
+noise_vib    = 0.4 * sin(2*pi*f_vib*t);
+
+noise_rand   = 0.05 * randn(size(t));
+
+signal_raw   = signal_clean + noise_vib + noise_rand;
+
+ 
+
+%% Manual Low-Pass Filter (RC filter, no toolbox needed)
+
+cutoff_hz = 30;                         % Cutoff frequency (Hz)
+
+RC        = 1 / (2*pi*cutoff_hz);      % RC time constant
+
+dt        = 1/fs;                       % Time step
+
+alpha     = dt / (RC + dt);            % Smoothing factor (0 to 1)
+
+ 
+
+signal_filtered = zeros(size(signal_raw));
+
+signal_filtered(1) = signal_raw(1);
+
+for i = 2:length(signal_raw)
+
+   signal_filtered(i) = alpha * signal_raw(i) + (1 - alpha) * signal_filtered(i-1);
+
+end
+
+ 
+
+%% FFT (manual, no toolbox)
+
+N      = length(t);
+
+f_axis = (0:N-1) * (fs/N);
+
+fft_raw  = abs(fft(signal_raw))  / N;
+
+fft_filt = abs(fft(signal_filtered)) / N;
+
+ 
+
+%% Vibration Energy Metric
+
+vib_before = sqrt(mean((signal_raw      - signal_clean).^2));
+
+vib_after  = sqrt(mean((signal_filtered - signal_clean).^2));
+
+fprintf('Vibration RMS before: %.4f\n', vib_before);
+
+fprintf('Vibration RMS after:  %.4f\n', vib_after);
+
+fprintf('Reduction: %.1f%%\n', (1 - vib_after/vib_before)*100);
+
+ 
+
+%% Plots
+
+figure('Name','Drone Vibration (No Toolbox)','Position',[100 100 1000 650]);
+
+ 
+
+subplot(2,2,1);
+
+plot(t, signal_raw, 'r', 'LineWidth', 0.7);
+
+title('Raw IMU Signal'); xlabel('Time (s)'); ylabel('Accel'); grid on;
+
+ 
+
+subplot(2,2,2);
+
+plot(t, signal_filtered, 'b', 'LineWidth', 1.2); hold on;
+
+plot(t, signal_clean, 'g--', 'LineWidth', 1);
+
+legend('Filtered','Ground Truth');
+
+title('Filtered Signal'); xlabel('Time (s)'); ylabel('Accel'); grid on;
+
+ 
+
+subplot(2,2,3);
+
+plot(f_axis(1:N/2), fft_raw(1:N/2)*2, 'r');
+
+title('FFT - Raw'); xlabel('Frequency (Hz)'); ylabel('Magnitude');
+
+xlim([0 200]); grid on;
+
+ 
+
+subplot(2,2,4);
+
+plot(f_axis(1:N/2), fft_filt(1:N/2)*2, 'b');
+
+title('FFT - Filtered'); xlabel('Frequency (Hz)'); ylabel('Magnitude');
+
+xlim([0 200]); grid on;
+
+ 
+
+sgtitle('Drone Vibration Filtering — No Toolbox Required');
+
