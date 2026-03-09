@@ -1,0 +1,44 @@
+%% Drone Rotation Simulation - Euler Angles (No Toolbox)
+clc; clear; close all;
+
+%% Parameters
+fs = 100;               % Sampling frequency (Hz)
+t  = 0:1/fs:5;          % 5 second flight
+
+%% Simulate Gyroscope Data (rad/s)
+roll_rate  = 0.3 * sin(2*pi*0.5*t);     % Roll  angular velocity
+pitch_rate = 0.2 * sin(2*pi*0.3*t);     % Pitch angular velocity
+yaw_rate   = 0.1 * ones(size(t));        % Steady yaw spin
+
+%% Integrate to get Euler Angles (simple Euler integration)
+dt    = 1/fs;
+roll  = zeros(size(t));
+pitch = zeros(size(t));
+yaw   = zeros(size(t));
+
+for i = 2:length(t)
+    roll(i)  = roll(i-1)  + roll_rate(i-1)  * dt;
+    pitch(i) = pitch(i-1) + pitch_rate(i-1) * dt;
+    yaw(i)   = yaw(i-1)   + yaw_rate(i-1)   * dt;
+end
+
+%% Convert to degrees
+roll_deg  = rad2deg(roll);
+pitch_deg = rad2deg(pitch);
+yaw_deg   = rad2deg(yaw);
+
+%% Plot
+figure('Position',[100 100 900 500]);
+subplot(3,1,1);
+plot(t, roll_deg,  'r', 'LineWidth', 1.5);
+title('Roll Angle');  ylabel('Degrees'); grid on;
+
+subplot(3,1,2);
+plot(t, pitch_deg, 'b', 'LineWidth', 1.5);
+title('Pitch Angle'); ylabel('Degrees'); grid on;
+
+subplot(3,1,3);
+plot(t, yaw_deg,   'g', 'LineWidth', 1.5);
+title('Yaw Angle');   ylabel('Degrees'); xlabel('Time (s)'); grid on;
+
+sgtitle('Drone Euler Angle Rotation (No Toolbox)');
