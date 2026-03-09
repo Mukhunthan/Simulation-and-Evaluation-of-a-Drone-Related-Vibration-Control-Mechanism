@@ -1,0 +1,72 @@
+%% Drone ON Condition - Startup & Arming Sequence (No Toolbox)
+clc; clear; close all;
+
+%% Parameters
+dt    = 0.01;
+T_end = 10;
+t     = 0:dt:T_end;
+N     = length(t);
+
+%% 4 Motor RPM Startup Simulation
+rpm_idle   = 1000;     % Idle RPM (armed, not flying)
+rpm_hover  = 4500;     % Hover RPM
+rpm_target = zeros(4, N);   % 4 motors
+
+for i = 1:N
+    if t(i) < 1
+        % OFF - motors stopped
+        rpm_target(:,i) = 0;
+    elseif t(i) < 3
+        % ARMING - slow spin up to idle
+        rpm_target(:,i) = rpm_idle * (t(i)-1)/2;
+    elseif t(i) < 5
+        % ARMED / IDLE - holding idle RPM
+        rpm_target(:,i) = rpm_idle;
+    elseif t(i) < 8
+        % THROTTLE UP - spinning to hover
+        rpm_target(:,i) = rpm_idle + (rpm_hover - rpm_idle) * (t(i)-5)/3;
+    else
+        % HOVER HOLD
+        rpm_target(:,i) = rpm_hover;
+    end
+end
+
+%% Add small noise per motor (realistic imbalance)
+noise_level = 30;
+rpm_actual = rpm_target + noise_level * randn(4, N);
+rpm_actual = max(0, rpm_actual);   % No negative RPM
+
+%% Motor Labels
+motor_labels = {'Motor 1 (FL)', 'Motor 2 (FR)', ...
+                'Motor 3 (RL)', 'Motor 4 (RR)'};
+colors = {'r','b','g','m'};
+
+%% Plot Motor RPMs
+figure('Position',[100 100 1000 600]);
+subplot(2,1,1);
+hold on;
+for m = 1:4
+    plot(t, rpm_actual(m,:), colors{m}, 'LineWidth', 1.2);
+end
+legend(motor_labels, 'Location','northwest');
+title('Motor RPM — Drone ON Sequence');
+ylabel('RPM'); xlabel('Time (s)'); grid on;
+
+% Annotate states
+xline(1, '--k', 'ARMED',   'LabelVerticalAlignment','bottom');
+xline(3, '--k', 'IDLE',    'LabelVerticalAlignment','bottom');
+xline(5, '--k', 'THROTTLE','LabelVerticalAlignment','bottom');
+xline(8, '--k', 'HOVER',   'LabelVerticalAlignment','bottom');
+
+%% Power Consumption per Motor (W = k * RPM^2)
+k_power = 1e-5;     % Power constant
+power   = k_power * rpm_actual.^2;
+total_power = sum(power, 1);
+
+subplot(2,1,2);
+plot(t, total_power, 'k', 'LineWidth', 1.8);
+title('Total Power Consumption');
+ylabel('Power (W)'); xlabel('Time (s)'); grid on;
+xline(1,'--k'); xline(3,'--k'); xline(5,'--k'); xline(8,'--k');
+
+sgtitle('Drone ON Condition — Arming & Motor Startup');
