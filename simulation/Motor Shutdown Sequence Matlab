@@ -1,0 +1,73 @@
+%% Drone OFF Condition - Shutdown Sequence (No Toolbox)
+clc; clear; close all;
+
+%% Parameters
+dt    = 0.01;
+T_end = 10;
+t     = 0:dt:T_end;
+N     = length(t);
+
+%% 4 Motor RPM Shutdown Simulation
+rpm_hover  = 4500;     % Starting from hover
+rpm_idle   = 1000;     % Idle before disarm
+rpm_target = zeros(4, N);
+
+for i = 1:N
+    if t(i) < 2
+        % HOVERING
+        rpm_target(:,i) = rpm_hover;
+    elseif t(i) < 4
+        % THROTTLE DOWN
+        rpm_target(:,i) = rpm_hover - (rpm_hover - rpm_idle) * (t(i)-2)/2;
+    elseif t(i) < 6
+        % IDLE / DISARMING
+        rpm_target(:,i) = rpm_idle;
+    elseif t(i) < 8
+        % DISARMED - spin down to zero
+        rpm_target(:,i) = rpm_idle * (1 - (t(i)-6)/2);
+    else
+        % FULLY OFF
+        rpm_target(:,i) = 0;
+    end
+end
+
+%% Add small noise per motor
+noise_level = 30;
+rpm_actual  = rpm_target + noise_level * randn(4, N);
+rpm_actual  = max(0, rpm_actual);
+
+%% Motor Labels & Colors
+motor_labels = {'Motor 1 (FL)','Motor 2 (FR)', ...
+                'Motor 3 (RL)','Motor 4 (RR)'};
+colors = {'r','b','g','m'};
+
+%% Plot Motor RPMs
+figure('Position',[100 100 1000 600]);
+subplot(2,1,1);
+hold on;
+for m = 1:4
+    plot(t, rpm_actual(m,:), colors{m}, 'LineWidth', 1.2);
+end
+legend(motor_labels, 'Location','northeast');
+title('Motor RPM — Drone OFF Shutdown Sequence');
+ylabel('RPM'); xlabel('Time (s)'); grid on;
+
+% Annotate states
+xline(2, '--k', 'THROTTLE DOWN', 'LabelVerticalAlignment','bottom');
+xline(4, '--k', 'IDLE',          'LabelVerticalAlignment','bottom');
+xline(6, '--k', 'DISARMED',      'LabelVerticalAlignment','bottom');
+xline(8, '--k', 'OFF',           'LabelVerticalAlignment','bottom');
+
+%% Power Consumption
+k_power   = 1e-5;
+power     = k_power * rpm_actual.^2;
+total_power = sum(power, 1);
+
+subplot(2,1,2);
+plot(t, total_power, 'k', 'LineWidth', 1.8);
+title('Total Power — Dropping to Zero');
+ylabel('Power (W)'); xlabel('Time (s)'); grid on;
+xline(2,'--k'); xline(4,'--k');
+xline(6,'--k'); xline(8,'--k');
+
+sgtitle('Drone OFF Condition — Motor Shutdown Sequence');
