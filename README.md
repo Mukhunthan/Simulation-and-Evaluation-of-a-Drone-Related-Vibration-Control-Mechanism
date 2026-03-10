@@ -1,50 +1,75 @@
-# Simulation and Evaluation of a Drone-Related Vibration Control Mechanism
-
-## Course
-Drone Technologies and its Transformative Applications
+# Simulation and Evaluation of a Drone Related Vibration Control Mechanism
 
 ## Project Overview
-Drone systems experience vibrations due to motors, propellers, and environmental disturbances. 
-This project focuses on modeling and simulating a vibration damping mechanism to improve drone stability.
+This project focuses on the **simulation and evaluation of vibration control mechanisms for drones (UAVs)** using **MATLAB and Simulink**. The objective is to analyze the effect of vibrations on drone stability and design a control strategy to reduce unwanted oscillations during flight.
+
+Unmanned Aerial Vehicles (UAVs) experience vibrations due to rotor dynamics, environmental disturbances, and structural effects. These vibrations can negatively affect **flight stability, sensor accuracy, and control performance**. Simulation-based analysis allows researchers to evaluate control strategies and improve drone performance before real-world implementation.
+
+The project models a drone vibration system and evaluates its response using simulation tools.
+
+---
 
 ## Objectives
-• Model a vibration damping system  
-• Simulate system response  
-• Compare different damping methods  
-• Evaluate vibration reduction performance  
 
-## Mathematical Model
-The vibration system is represented using a mass-spring-damper model.
+- Model a **drone vibration system** in MATLAB/Simulink  
+- Analyze the **dynamic response of the drone system**  
+- Implement a **control mechanism to reduce vibration**  
+- Evaluate system performance using simulation graphs  
+- Study the effectiveness of vibration control in improving stability  
 
-mẍ + cẋ + kx = F(t)
+---
 
-Where  
-m = mass  
-c = damping coefficient  
-k = stiffness  
-x = displacement  
+## Technologies Used
 
-## Tools Used
-• MATLAB / Simulink  
-• Dynamic System Modeling  
-• GitHub  
+- MATLAB  
+- Simulink  
+- Control System Modeling  
+- Signal Analysis  
+- Dynamic System Simulation  
 
-## Damping Methods Compared
-1. Rubber Dampers  
-2. Spring-Damper System  
-3. Viscoelastic Materials  
-
-## Results
-Simulation results show that the spring-damper system provides better vibration suppression and improves drone stability.
+---
 
 ## Repository Structure
-report → Project report  
-presentation → Project slides  
-simulation → MATLAB code  
-results → Simulation graphs  
 
-## Authors
-Kanish Koushik KR 
-Ganesh Reddy S
-Sidharth Sivan
-Mukhunthan AR
+##  System Description
+
+The system simulates vibration behavior in a drone structure and evaluates the effect of a control mechanism.
+
+### System Components
+
+- Drone dynamic model  
+- Vibration disturbance input  
+- Controller block  
+- Feedback loop  
+- System response analysis  
+
+The model analyzes how disturbances influence the drone and how the controller stabilizes the system.
+
+---
+
+## Simulation Results
+
+The simulation evaluates the following system characteristics:
+
+- System stability  
+- Vibration amplitude  
+- Transient response  
+- Settling time  
+- Controller effectiveness  
+
+Typical plots generated include:
+
+- Step response  
+- Frequency response  
+- Vibration amplitude graphs  
+- System response comparison  
+
+---
+
+## How to Run the Project
+
+1. Install **MATLAB and Simulink**
+2. Clone this repository
+
+```bash
+git clone https://github.com/Mukhunthan/Simulation-and-Evaluation-of-a-Drone-Related-Vibration-Control-Mechanism.git
