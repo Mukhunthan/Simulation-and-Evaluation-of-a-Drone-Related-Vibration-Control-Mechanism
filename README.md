@@ -65,11 +65,3 @@ Typical plots generated include:
 - System response comparison  
 
 ---
-
-## How to Run the Project
-
-1. Install **MATLAB and Simulink**
-2. Clone this repository
-
-```bash
-git clone https://github.com/Mukhunthan/Simulation-and-Evaluation-of-a-Drone-Related-Vibration-Control-Mechanism.git
